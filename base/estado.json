@@ -1,7 +1,6 @@
 {
  "v": 1,
- "guardado": "2026-10-27T03:18:25+00:00",
- "origen": "claude.ai (migrado)",
+ "guardado": "2026-10-27T03:26:52Z",
  "docs": {
   "votos/agustina": {
    "origen": "Excel",
@@ -209,6 +208,11 @@
    "msg": "",
    "resp": {},
    "t": 1792992622805
-  }
+  },
+  "estado/hojas": {}
+ },
+ "ultimo": {
+  "id": "CFfS45lUfdFt",
+  "time": 1793071589
  }
 }
