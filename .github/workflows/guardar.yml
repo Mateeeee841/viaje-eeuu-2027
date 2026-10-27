@@ -1,0 +1,38 @@
+name: Guardar cambios de la familia
+
+# Los votos y decisiones viajan por ntfy.sh, que los guarda 12 horas.
+# Esta tarea los pasa a base/estado.json cada 10 minutos para que queden para siempre.
+on:
+  schedule:
+    - cron: "*/10 * * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: guardar
+  cancel-in-progress: false
+
+jobs:
+  guardar:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Juntar los mensajes de ntfy
+        run: node nube/guardar.mjs
+      - name: Guardar en el repositorio
+        run: |
+          # GitHub apaga las tareas programadas de un repositorio sin movimiento por 60 días: cada tanto se deja una marca.
+          if [ $(( $(date +%s) - $(git log -1 --format=%ct) )) -gt 2160000 ]; then date -u +%FT%TZ > base/latido.txt; fi
+          git add base
+          if git diff --cached --quiet; then echo "Nada para guardar"; exit 0; fi
+          git config user.name "guardar-viaje"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "Guardar cambios de la familia"
+          for i in 1 2 3; do git pull --rebase -q && git push && exit 0; sleep 5; done
+          exit 1
